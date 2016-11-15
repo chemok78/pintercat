@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="picsApp" ng-controller="mainController">
-    
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, intial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
@@ -34,11 +33,11 @@
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#/">Home</a></li>
-                    <li><a href="/#allpics">All Pics</a></li>
-                    <li ng-show="loggedin === true"><a href="/#mypics">My Pics</a></li>
-                    <li ng-show="loggedin === true"><a href="">Add a Pic</a></li>
-                    <li><a href="">Log In</a></li>
-                    <li ng-show="loggedin === true"><a href="">Log Out</a></li>
+                    <li ng-show="loggedIn === true"><a href="/#allpics">All Pics</a></li>
+                    <li ng-show="loggedIn === true"><a href="/#mypics">My Pics</a></li>
+                    <li ng-show="loggedIn === true"><a href="">Add a Pic</a></li>
+                    <li ng-show="loggedIn === false"><a href="/auth/twitter">Sign in with Twitter</a></li>
+                    <li ng-show="loggedIn === true"><a href="/logout">Log Out</a></li>
                 </ul>
             </div><!--collapse navbar-collapse-->
             </div><!--container-->
