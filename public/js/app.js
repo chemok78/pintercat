@@ -18,16 +18,26 @@ angular.module("picsApp", ['ngRoute'])
             
             return $http.get("/loggedin");
             
-        }
+        };
         
     })
-    .controller("mainController", function($scope, $rootScope, Login){
+    .service("Users", function($http){
+        
+        this.retrieveUser = function(url){
+            
+            return $http.get(url);
+            
+        };    
+        
+    })
+    .controller("mainController", function($scope, $rootScope, Login, Users){
     //mainController is loaded in index.html 
     
         Login.isLoggedIn()
         //every time main controller is loaded, we check if a user is logged in
         .then(function(response){
-        //server returns '0' if no user is authenticated
+        //server returns data from Passport JS    
+        //server returns '0' if no user is authenticated 
         //server returns 'req.user' if a user is authenticated
             
             if(response.data == '0'){
@@ -40,13 +50,37 @@ angular.module("picsApp", ['ngRoute'])
                 
                 console.log("We found a user!");
                 console.log (response.data)
+                console.log (response.data.id);
                 
                 $rootScope.loggedIn = true;
-                $rootScope.userObject = response.data._json;
+                //$rootScope.userObject = response.data._json;
+                
+                $scope.userID = response.data.id;
+                
+                //find the user in the database (including all the pins) and bind to $rootScope
+                //so we have access to the current user including all the pins in All Controllers
+                
+                var url = "/retrieveuser/" + $scope.userID;
+                
+                Users.retrieveUser(url)
+                    .then(function(response){
+                        
+                        console.log("Successfully retrieved current user from DB");
+                        console.log(response.data);
+                        
+                        $rootScope.currentUser = response.data;
+                    
+                        
+                    }, function(response){
+                        
+                        console.log("Error retrieving current user from DB");
+                        
+                    });
+                
                 
             }
             
-        });
+        }); //.then(function(response)
         
         
     })

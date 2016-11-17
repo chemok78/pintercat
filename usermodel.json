@@ -1,0 +1,35 @@
+{
+    //id
+    //profile picture of user
+    //name
+    //pins: [objectID, objectID, objectID]
+    
+}
+
+{  
+    //objectID
+    //image url
+    //description
+    //stars
+}
+
+// one to many relationship. 1 user has many pins. Every pin has 1 user
+//user and then an array of pins?
+
+//Application level join:
+
+ // Fetch the Product document identified by this catalog number
+product = db.products.findOne({catalog_number: 1234});
+   // Fetch all the Parts that are linked to this Product
+product_parts = db.parts.find({_id: { $in : product.parts } } ).toArray() ;
+
+
+//For efficient operation, you’d need to have an index on ‘products.catalog_number’. 
+
+//https://docs.mongodb.com/v3.0/tutorial/model-referenced-one-to-many-relationships-between-documents/
+
+//one to few: embed. User document has an array with pins
+//one to many: references. User document has an array with Object ID's referencing pins
+//one to zillion: references. Each pin has a reference to the user
+
+

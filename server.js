@@ -38,7 +38,49 @@ app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
 //parse all requests as JSON in the app instance
 
-app.use(session({
+var db;
+//use global variable to save database instance to use the connection throughout the app
+
+
+mongodb.MongoClient.connect(process.env.DB_URL, function(err,database){
+    
+    if(err){
+        
+        console.log(err);
+        
+        process.exit(1);
+        
+    }
+    
+    db = database;
+    
+    console.log("successfully connected to database");
+    
+    var server = app.listen(process.env.PORT || 8080, function(){
+        
+       var port = server.address().port;
+       
+       console.log("App is now running on port", port);
+        
+        
+    });
+    
+    /*RESTful API Web services*/
+    
+    function handleError(res,reason, message, code){
+        
+        console.log("ERROR: " + reason);
+        
+        res.status(code || 500).json({
+         
+         "error": message   
+            
+        })
+        
+    }
+    
+    
+    app.use(session({
 //use express sessions in app    
     secret: 'keyboard cat'
     
@@ -50,8 +92,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 //intialize passport sessions and use it in the app
 
-var db;
-//use global variable to save database instance to use the connection throughout the app
 
 passport.use(new TwitterStrategy({
     
@@ -64,7 +104,59 @@ passport.use(new TwitterStrategy({
     process.nextTick(function(){
         
        console.log("logging profile!");    
-       console.log(profile);    
+       console.log(profile._json.id); //_json.id is a number
+       
+       //check if user exists in database
+       //if not, make a new document for the user
+       
+       db.collection(PICS_COLLECTION).findOne({id: profile.id}, function(err,doc){
+           
+           if(err){
+               
+               console.log("Error findOne user in DB");
+               
+           } else {
+               
+               if(doc == null){
+                   
+                   var userObject  = {};
+                   //construct userObject to be saved in the database
+                   
+                   userObject.id = profile.id;
+                   //we use the id from the profile object that is a string
+                   userObject.name = profile._json.name;
+                   userObject.screen_name = profile._json.screen_name;
+                   userObject.profile_image_url = profile._json.profile_image_url_https;
+                   userObject.pins = [];
+                   //one to many relationship, user has many pins and pin has 1 user
+                   //userObject.pins is an array of id's referencing the pin Object ID's
+                   
+                   db.collection(PICS_COLLECTION).insertOne(userObject, function(err,doc){
+                       
+                      if(err){
+                          
+                          console.log("Error insertOne userObject");
+                          
+                      } else {
+                          
+                          console.log("user inserted in database");
+                          
+                          console.log(doc);
+                          
+                          
+                      }
+                      
+                       
+                       
+                   }); // db.collection(PICS_COLLECTION).insertOne(userObject
+                   
+                   
+               }
+               
+           }//if, else
+           
+           
+       });//db.collection(PICS_COLLECTION).findOne({id: profile._json.id}
         
        done(null, profile);
         
@@ -165,42 +257,33 @@ app.get('/logout', function(req,res){
     
 });
 
-mongodb.MongoClient.connect(process.env.DB_URL, function(err,database){
+/*RESTful API's*/
+
+app.get('/retrieveuser/:user', function(req,res){
+    //called from Users.retrieveuser service in front-end 
+    //sends user id as parameter to look up in the database
     
-    if(err){
-        
-        console.log(err);
-        
-        process.exit(1);
-        
-    }
+    console.log("we are retrieving a user with params" + " " + req.params.user);
     
-    db = database;
-    
-    console.log("successfully connected to database");
-    
-    var server = app.listen(process.env.PORT || 8080, function(){
+    db.collection(PICS_COLLECTION).findOne({id: req.params.user}, function(err,doc){
         
-       var port = server.address().port;
-       
-       console.log("App is now running on port", port);
-        
-        
-    });
-    
-    /*RESTful API Web services*/
-    
-    function handleError(res,reason, message, code){
-        
-        console.log("ERROR: " + reason);
-        
-        res.status(code || 500).json({
-         
-         "error": message   
+        if(err){
             
-        })
+            console.log("Error findOne user from DB");
+            
+        } else {
+            
+            console.log(doc);
+            
+            res.status(200).json(doc);
+            
+        }
         
-    }
+        
+        
+    }); //db.collection(PICS_COLLECTION).findOne({}
+    
+}); //app.get('/retrieveuser/:user'
     
     
 }); //mongodb.MongoClient.connect
