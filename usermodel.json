@@ -32,4 +32,25 @@ product_parts = db.parts.find({_id: { $in : product.parts } } ).toArray() ;
 //one to many: references. User document has an array with Object ID's referencing pins
 //one to zillion: references. Each pin has a reference to the user
 
+//pins model
 
+{
+    "type": "user",
+    "_id":"582c27444e2c351304aedbdc",
+    "id":"39719618",
+    "name":"jet",
+    "screen_name":"Che78",
+    "profile_image_url":"https://pbs.twimg.com/profile_images/2100726267/2011-03-12-twitter-egg_normal.png",
+    "pins":[]}
+
+{
+    "type": "pin",
+    "_id": "fdsfdfdsfdsfdsfdss",
+    "url": "http://google.com/image.jpg",
+    "description": "nice and cool",
+    "userID": "39719618"
+    "likes": ["id", "id", "id"]
+}
+
+//Show all pins: All pins with type: "pin"
+//show my pins: use pins array tp search all documents with userID

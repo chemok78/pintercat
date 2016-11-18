@@ -1,0 +1,11 @@
+Add Pic Form:
+
+-Both fields are required
+-No need to check whether it's a real URL
+-Send button activates only when something is filled in
+
+---
+
+no need to (because we validate front-end side): If description field is empty: we add Picture by User. Either front-end or back-end before saving to database
+
+if url doesnt work (probably need to check on backend, we show a standard image)

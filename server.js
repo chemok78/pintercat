@@ -122,6 +122,7 @@ passport.use(new TwitterStrategy({
                    var userObject  = {};
                    //construct userObject to be saved in the database
                    
+                   userObject.type = "user",
                    userObject.id = profile.id;
                    //we use the id from the profile object that is a string
                    userObject.name = profile._json.name;
@@ -263,8 +264,6 @@ app.get('/retrieveuser/:user', function(req,res){
     //called from Users.retrieveuser service in front-end 
     //sends user id as parameter to look up in the database
     
-    console.log("we are retrieving a user with params" + " " + req.params.user);
-    
     db.collection(PICS_COLLECTION).findOne({id: req.params.user}, function(err,doc){
         
         if(err){
@@ -284,6 +283,147 @@ app.get('/retrieveuser/:user', function(req,res){
     }); //db.collection(PICS_COLLECTION).findOne({}
     
 }); //app.get('/retrieveuser/:user'
+
+
+app.post("/addpicture", function(req,res){
+//called from Pins.addPicture method that sends the pics object from form
+//we have req.user.id (string) and req.body
+
+    console.log("adding picture!");
+    console.log(req.user);
+    console.log(req.body);
+    
+    //check if user image not broken is, before saving pic object to database
+    
+    var pinObject = {
+        
+        "type": "pin",
+        "url": req.body.url,
+        "descripton": req.body.description,
+        "userID": req.user.id,
+        "profile_image_url": req.user.profile_image_url,
+        "likes": []
+        
+    };
+    
+    //save pin in database
+    //add ObjectID to user.pins
+    
+    db.collection(PICS_COLLECTION).insertOne(pinObject, function(err, doc){
+       
+       if(err){
+           
+           handleError(res,err.message, "Failed to insert Pin");
+           
+       } else {
+           
+          console.log(doc.ops[0]);
+          console.log(doc.ops[0]._id);
+         
+          //database insert returns inserted document as doc.ops[0]
+          //doc.ops[0] has the MongoDB ObjectID as ._id, which is an object (not a string)
+          
+          var o_id = doc.ops[0]._id;
+          //save object ID
+          
+          var o_id_string = o_id.toString();
+          //convert object ID to string, to be saved in the User document
+          
+         //convert the string back to an ObjectID with ObjectID(o_id_string)
+        
+         
+         db.collection(PICS_COLLECTION).findAndModify({
+         //find logged in user in database and add the object ID reference to the pins array
+         
+         id:req.user.id },
+         
+         [['_id', 'asc']],
+         
+         {
+             $push: {pins: o_id_string } }
+         
+             
+         , { 
+             
+             new: true 
+             
+         }, function(err,doc){
+             
+          if(err){
+              
+              console.log(err);
+              
+          } else {
+              
+              console.log("successfully added o_id_string to pins array user");
+              
+              console.log(doc.value);
+              
+              
+          }
+             
+             
+         })
+         
+           
+       } //if, else
+        
+        
+    }); //db.collection(PICS_COLLECTION).insertOne(pinObject
+    
+    console.log(pinObject);
+    
+}); //app.post("/addpicture"
+
+
+app.get("/retrieveallpins", function(req,res){
+   
+   
+   db.collection(PICS_COLLECTION).find({type: "pin"}).toArray(function(err,doc){
+      
+      if(err){
+          
+          console.log("Error retrieving all pins");
+          
+      } else {
+          
+          console.log(doc);
+          
+          res.status(200).json(doc);
+      }
+       
+       
+   }); //db.collection(PICS_COLLECTION).find
+    
+    
+}); // app.get("/retrieveallpins"
+
+
+app.get("/retrieveuserpins", function(req,res){
+//we have req.user.id (string) and req.body    
+    
+    console.log("retrieving user pins for " + req.user.id);
+    console.log(req.user.id);
+    
+    db.collection(PICS_COLLECTION).find({userID: req.user.id, type: "pin"}).toArray(function(err,doc){
+       
+       if(err){
+           
+           console.log("Error retrieving all pins belonging to user " + req.user.id);
+           
+       } else {
+           
+           console.log("we found the pins belonging to " + req.user.id);
+           
+           res.status(200).json(doc);
+           
+       }
+        
+        
+    }); //db.collection(PICS_COLLECTION)
+    
+    
+});//app.get("/retrieveuserpins"
     
     
 }); //mongodb.MongoClient.connect

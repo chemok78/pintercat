@@ -37,3 +37,9 @@ footer {
     font-size:22px;
     
 }
+
+.errorMessage {
+    
+    color: red;
+    
+}
