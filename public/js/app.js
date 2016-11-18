@@ -1,5 +1,6 @@
 /*global angular*/
 /*global Image*/
+/*global $*/
 
 angular.module("picsApp", ['ngRoute'])
   //create Angular JS app and inject ngRoute module
@@ -85,6 +86,14 @@ angular.module("picsApp", ['ngRoute'])
       return $http.get("/retrieveuserpins");
 
 
+    };
+    
+    this.deleteUserPic = function(picObject){
+    //method to delete a pic belonging to user
+    //called from MyPicsController
+      
+      return $http.post("/deleteuserpic", picObject);
+      
     };
 
   })
@@ -187,9 +196,23 @@ angular.module("picsApp", ['ngRoute'])
             //once image is checked, we add the pic to the database
             //embedded in the call back function of the checkImage call
             .then(function(response) {
+            
+            //response.data is the pinObject that was inserted in the database
 
-              console.log(response.data);
-
+               var o_id = response.data._id;
+               //save the objectID of the inserted pin
+       
+              var o_id_string = o_id.toString();
+              //convert objectID to string
+              
+              $rootScope.allPins.push(response.data);
+              //add the inserted Pin to the rootScope of all pins
+              $rootScope.userPins.push(response.data);
+              //add the inserted Pin to the rootScope of all pins belonging to logged in User
+              $rootScope.currentUser.pins.push(o_id_string);
+              //add the inserted Pin object ID to the rootScope of the current user
+            
+              
             }, function(response) {
 
               console.log("Error adding picture to database");
@@ -214,9 +237,86 @@ angular.module("picsApp", ['ngRoute'])
 
 
   })
-  .controller("MyPicsController", function($scope, $rootScope){
+  .controller("MyPicsController", function($scope, $rootScope, Pins){
   //controller for the mypics.html view  
     
+     $scope.deletePic = function(pic){
+       
+       Pins.deleteUserPic(pic)
+        .then(function(response){
+          
+          //delete pin in database successfull, update $rootScope here
+          
+           /*{ _id: '582e86128ec1210ce43d913b',
+           type: 'pin',
+           url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Brother_cream_in_stall.jpg/220px-Brother_cream_in_stall.jpg',
+           description: 'dasdsada',
+           userID: '39719618',
+           profile_image_url: null,
+          likes: [] }*/
+          
+              
+              var indexPin = 0;
+              
+              $rootScope.allPins.forEach(function(item,index){
+              //every element of allPins is an object of a pin
+                  
+                  if(item._id === pic._id) {
+                  //if the _id of pic chosen matches item._id save the index  
+                    
+                    indexPin = index;
+                    
+                  }
+                
+              }); //$rootScope.allPins.forEach
+              
+              $rootScope.allPins.splice(indexPin, 1);
+              
+              var indexUser = 0;
+              
+              $rootScope.userPins.forEach(function(item,index){
+              //every element of userPins is an object of a pin
+                  
+                  if(item._id === pic._id) {
+                  //if the _id of pic chosen matches item._id save the index  
+                    
+                    indexUser = index;
+                    
+                  }
+                
+              }); //$rootScope.userPins.forEach
+              
+              $rootScope.userPins.splice(indexUser, 1);
+              
+            
+              //$rootScope.currentUser.pins.push(o_id_string);
+              //add the inserted Pin object ID to the rootScope of the current user
+              
+              var indexReference = 0;
+              
+              $rootScope.currentUser.pins.forEach(function(item,index){
+              //every element of userPins is an object of a pin
+                  
+                  if(item === pic._id) {
+                  //if the _id of pic chosen matches item._id save the index  
+                    
+                    indexReference = index;
+                    
+                  }
+                
+              }); //$rootScope.userPins.forEach
+              
+              $rootScope.currentUser.pins.splice(indexReference, 1);
+
+          
+        }, function(response){
+          
+          console.log("Error deleting pic belonging to user");
+          
+        })
+       
+       
+     };
     
   })
   .service('authInterceptor', function($q) {
@@ -246,3 +346,4 @@ angular.module("picsApp", ['ngRoute'])
 
     $httpProvider.interceptors.push('authInterceptor');
   }]);
+  

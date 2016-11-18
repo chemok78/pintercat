@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <!--pic JSON object with pic.url and pic.description from the form-->
-<!--$rootScope.userObject is available-->
+<!--$rootScope.currentUser is available-->
 <html lang="en" ng-app="picsApp" ng-controller="mainController">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="https://unpkg.com/masonry-layout@4.1/dist/masonry.pkgd.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js"></script>
@@ -16,7 +17,7 @@
         <!--link Angular JS file-->
         <script src="/js/app.js"></script>
         <!--link Font Awesome-->
-         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     
     <body>
@@ -93,7 +94,8 @@
             </div>
             
         </footer>
-        
+    
+   
     </body>
     
 </html>

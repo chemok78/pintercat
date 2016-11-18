@@ -299,7 +299,7 @@ app.post("/addpicture", function(req,res){
         
         "type": "pin",
         "url": req.body.url,
-        "descripton": req.body.description,
+        "description": req.body.description,
         "userID": req.user.id,
         "profile_image_url": req.user.profile_image_url,
         "likes": []
@@ -373,6 +373,8 @@ app.post("/addpicture", function(req,res){
     
     console.log(pinObject);
     
+    res.status(200).json(pinObject);
+    
 }); //app.post("/addpicture"
 
 
@@ -424,6 +426,97 @@ app.get("/retrieveuserpins", function(req,res){
     
     
 });//app.get("/retrieveuserpins"
+
+app.post("/deleteuserpic", function(req,res){
+    
+  /*{ _id: '582e86128ec1210ce43d913b',
+  type: 'pin',
+  url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Brother_cream_in_stall.jpg/220px-Brother_cream_in_stall.jpg',
+  description: 'dasdsada',
+  userID: '39719618',
+  profile_image_url: null,
+  likes: [] }*/
+
+    console.log(req.body);
+    
+    if(req.user.id === req.body.userID){
+    //update only when user ID in pin is the same as user ID logged in    
+        
+        console.log("The pin belongs to the logged in user!");
+        
+        //delete the whole pin document from the database
+        
+        
+        db.collection(PICS_COLLECTION).deleteOne({_id: new ObjectID(req.body._id)}, function(err,result){
+        //req.body._id is a string (we converted from objectID before saving to database)
+        //_id in database is an object ID
+        //so convert req.body._id to objectID first before looking up in database
+        
+            console.log(result.deletedCount);
+            //result.deletedCount is 1 when a document is deleted and 0 when nothing is deleted
+            
+            if(err){
+            
+              console.log("Error deleting pin from database");    
+                
+            } else {
+                
+                //console.log(result);
+                
+              console.log("Success deleting pin from database");    
+                
+            }
+            
+        });//db.collection(PICS_COLLECTION).deleteOne
+        
+        
+        db.collection(PICS_COLLECTION).update(
+        //delete the Object ID from the user in database
+        
+        {
+            id: req.body.userID,
+            //find the user in database with userID reference in pin
+        }, 
+        
+        {
+            $pull:
+            //delete in the pins array of user, the element that matches the req.body._id
+            
+            { 
+                 pins: req.body._id
+            }
+            
+        }, function(err,doc){
+            
+            
+            if(err){
+                
+                console.log(err);
+                
+            } else {
+                
+                console.log("successfully deleted pin reference from user");
+                
+                res.status(200).json(doc);
+                
+            }
+            
+            
+        }
+            
+        );//db.collection(PICS_COLLECTION).update
+        
+    } else {
+    //User is not the one belonging to the Pin    
+        
+        res.sendStatus(401);
+        //send unauthorized http status 
+        
+    }
+    
+    
+    
+});//app.post("/deleteuserpic"
     
     
 }); //mongodb.MongoClient.connect
