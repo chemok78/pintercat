@@ -96,6 +96,14 @@ angular.module("picsApp", ['ngRoute'])
       
     };
 
+    this.editLikes = function(pic){
+    //method to remove or add likes
+    
+      return $http.post("/editlikes", pic);
+      
+      
+    };
+
   })
   .controller("mainController", function($scope, $rootScope, Login, Users, Pins) {
     //mainController is loaded in index.html 
@@ -227,6 +235,59 @@ angular.module("picsApp", ['ngRoute'])
         });
 
 
+    };
+    
+    $rootScope.editLikes = function(pic){
+    //method to add or remove likes for the user  
+      
+      Pins.editLikes(pic)
+        .then(function(response){
+          
+          console.log("Successfully edited likes");
+          
+          console.log(response);
+          
+          //update scope for $rootScope.allPins
+          
+          console.log($rootScope.allPins);
+          console.log(pic);
+          
+          $rootScope.allPins.forEach(function(item,index){
+          //loop through allPins of $rootScope and find the pin that matches the pic to be edited from front-end  
+            
+              if(item._id === pic._id){
+              //find item of $rootScope allPins matches pic_id
+                    if(item.likes.indexOf(pic.userID) === -1){
+                    //userID doest not exist in likes array
+                    
+                        $rootScope.allPins[index].likes.push(pic.userID);
+                        //add the userID to the likes array of $rootScope
+                        
+                      
+                    } else {
+                    //userID exists in likes array  
+                    
+                      var indexDelete = item.likes.indexOf(pic.userID);
+                      //find the index where the userID exists in likes array
+                      
+                     $rootScope.allPins[index].likes.splice(indexDelete,1);
+                     //delete the userID from likes array in rootScope
+                      
+
+                    }    
+                
+                
+              }
+            
+          });
+          
+        }, function(response){
+          
+          console.log("Error editing likes");
+          
+        });
+      
+      
     };
 
 

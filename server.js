@@ -301,7 +301,7 @@ app.post("/addpicture", function(req,res){
         "url": req.body.url,
         "description": req.body.description,
         "userID": req.user.id,
-        "profile_image_url": req.user.profile_image_url,
+        "profile_image_url": req.user._json.profile_image_url_https,
         "likes": []
         
     };
@@ -517,6 +517,135 @@ app.post("/deleteuserpic", function(req,res){
     
     
 });//app.post("/deleteuserpic"
+
+app.post("/editlikes", function(req,res){
+//route to add or remove likes    
+    
+   /*{ _id: '582eac4f3308ba12dd59174c',
+  type: 'pin',
+  url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Brother_cream_in_stall.jpg/220px-Brother_cream_in_stall.jpg',
+  description: 'cxzcxzcxzxz',
+  userID: '39719618',
+  profile_image_url: null,
+  likes: [] }*/
+    
+   console.log(req.body._id);
+   console.log(req.user.id);
+   
+   db.collection(PICS_COLLECTION).findOne({_id: new ObjectID(req.body._id)}, function(err,doc){
+   //find the pic object in the database with the _id property of the pic from front-end
+   
+       if(err){
+           
+           console.log("Error finding the pin to edit likes");
+           
+       } else {
+           
+           
+           if(doc.likes.indexOf(req.body.userID) === -1){
+           //if the likes array does not have the user ID from the pic object       
+           //add the user ID from req.body._id to the array  
+           //use Mongo $push
+           
+           db.collection(PICS_COLLECTION).update(
+            
+            {
+                
+                _id: new ObjectID(req.body._id)
+                
+            },
+            
+            {
+                
+                $push:
+                
+                {
+                    likes: req.user.id
+                    
+                }
+                
+            }, function(err,doc){
+                
+                if(err){
+                    
+                    console.log("Could not add user ID to likes pin of selected pin");
+                    
+                } else{
+                    
+                    res.status(200).json(doc);
+                    
+                    
+                }
+                
+                
+            }
+               
+          ); //db.collection(PICS_COLLECTION).update
+           
+            
+               
+               
+           } else {
+           //if the likes array has the user ID from the pic object
+           //remove the user ID from req.body._id to the array       
+           //use Mongo $pull   
+           
+           console.log("could find the user ID in likes array");
+           
+            db.collection(PICS_COLLECTION).update(
+            
+            {
+                
+                _id: new ObjectID(req.body._id)
+                
+            },
+            
+            {
+                
+                $pull:
+                
+                {
+                    likes: req.user.id
+                    
+                }
+                
+            }, function(err,doc){
+                
+                if(err){
+                    
+                    console.log("Could not remove user ID to likes pin of selected pin");
+                    
+                } else{
+                    
+                    res.status(200).json(doc);
+                    
+                    
+                }
+                
+                
+            }
+               
+          ); //db.collection(PICS_COLLECTION).update
+           
+           
+               
+           }
+           
+           
+       }
+       
+       
+       
+   }); //db.collection(PICS_COLLECTION).findOne({_id: req.body_id} 
+    
+   //find the pin in the database, and check if user ID is present.
+   //If user ID is present, remove the user ID.
+   //if user ID not present, add the user ID
+   
+   
+    
+    
+});
     
     
 }); //mongodb.MongoClient.connect
