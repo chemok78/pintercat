@@ -83,9 +83,7 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
 
   app.use(session({
     //use express sessions in app    
-    secret: 'keyboard cat',
-    
-    cookie: {secure:true}
+    secret: 'keyboard cat'
 
   }));
 
