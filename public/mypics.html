@@ -1,10 +1,10 @@
-<div class="container">
-    <div class="grid">
-        <div ng-repeat="pin in userPins" class="grid-item">
-            <img src="{{pin.url}}" class="img-thumbnail img-responsive img-rounded">
-            <p>{{pin.description}}</p>
-             <button type="submit" class="btn btn-default btn-danger" ng-click="deletePic(pin)">Delete</button>
-             <p>{{pin.likes.length}} Likes</p>
-        </div>
-    </div>
+<div class="container" ng-controller="images">
+    <ul angular-grid="allPins" grid-width="250" gutter-size="10" angular-grid-id="gallery" refresh-on-img-load="false">
+        <li ng-repeat="pin in userPins" class="grid">
+            <img src="{{pin.url}}" class="grid-img">
+            <p class="description text-center">{{pin.description}}</p>
+             <button type="submit" class="btn btn-default btn-danger delete-button" ng-click="deletePic(pin)">Delete</button>
+             <p class="likes">{{pin.likes.length}} Likes</p>
+        </li>
+    </ul>
 </div>

@@ -2,7 +2,7 @@
 /*global Image*/
 /*global $*/
 
-angular.module("picsApp", ['ngRoute'])
+angular.module("picsApp", ['ngRoute', 'angularGrid'])
   //create Angular JS app and inject ngRoute module
   .config(function($routeProvider) {
     $routeProvider
@@ -214,6 +214,15 @@ angular.module("picsApp", ['ngRoute'])
               //add the inserted Pin to the rootScope of all pins belonging to logged in User
               $rootScope.currentUser.pins.push(o_id_string);
               //add the inserted Pin object ID to the rootScope of the current user
+              
+              $scope.pic.url = "";
+              $scope.pic.description = "";
+              
+              $('#addPicModal').modal('hide');
+              //hide the modal after submit
+              
+              $scope.picForm.$setPristine();
+              //reset the form states
 
 
             }, function(response) {
@@ -260,6 +269,35 @@ angular.module("picsApp", ['ngRoute'])
                 //find the index where the userID exists in likes array
 
                 $rootScope.allPins[index].likes.splice(indexDelete, 1);
+                //delete the userID from likes array in rootScope
+                //splice removes an element
+
+              }
+
+
+            }
+
+          });
+          
+          $rootScope.userPins.forEach(function(item, index) {
+            //loop through userPins of $rootScope and find the pin that matches the pic to be edited from front-end  
+
+            if (item._id === pic._id) {
+              //find item of $rootScope allPins matches pic_id
+              if (item.likes.indexOf(pic.userID) === -1) {
+                //userID doest not exist in likes array
+
+                $rootScope.userPins[index].likes.push(pic.userID);
+                //add the userID to the likes array of $rootScope
+
+
+              } else {
+                //userID exists in likes array  
+
+                var indexDelete = item.likes.indexOf(pic.userID);
+                //find the index where the userID exists in likes array
+
+                $rootScope.userPins[index].likes.splice(indexDelete, 1);
                 //delete the userID from likes array in rootScope
                 //splice removes an element
 
@@ -385,4 +423,29 @@ angular.module("picsApp", ['ngRoute'])
     //add authInterceptor service to httpProvider so its used in    
 
     $httpProvider.interceptors.push('authInterceptor');
-  }]);
+  }])
+    .service('imageService',['$q','$http',function($q,$http){
+        this.loadImages = function(){
+            return $http.jsonp("https://api.flickr.com/services/feeds/photos_public.gne?format=json&jsoncallback=JSON_CALLBACK");
+        };
+    }])
+    .controller('images', ['$scope','imageService','angularGridInstance', function ($scope,imageService,angularGridInstance) {
+       
+       
+       imageService.loadImages().then(function(data){
+            data.data.items.forEach(function(obj){
+                var desc = obj.description,
+                    width = desc.match(/width="(.*?)"/)[1],
+                    height = desc.match(/height="(.*?)"/)[1];
+ 
+                obj.actualHeight  = height;
+                obj.actualWidth = width;
+            });
+           $scope.pics = data.data.items;
+        });
+        $scope.refresh = function(){
+            angularGridInstance.gallery.refresh();
+        };
+    }]);
+  
+  

@@ -17,17 +17,6 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 //load ObjectID method so we can generate new objectID, using objectID = new ObjectID
 
-var passport = require("passport");
-//load passport.js
-
-var TwitterStrategy = require("passport-twitter").Strategy;
-//load passport.js Twitter-Strategy
-
-var session = require("express-session");
-//load express session
-
-var PICS_COLLECTION = "pics";
-
 var app = express();
 
 /*Express Middleware*/
@@ -37,6 +26,18 @@ app.use(express.static(__dirname + "/public"));
 
 app.use(bodyParser.json());
 //parse all requests as JSON in the app instance
+
+var session = require("express-session");
+//load express session
+
+var passport = require("passport");
+//load passport.js
+
+var TwitterStrategy = require("passport-twitter").Strategy;
+//load passport.js Twitter-Strategy
+
+
+var PICS_COLLECTION = "pics";
 
 var db;
 //use global variable to save database instance to use the connection throughout the app
@@ -78,7 +79,7 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
     });
 
   }
-
+  
 
   app.use(session({
     //use express sessions in app    
@@ -179,6 +180,8 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
   passport.deserializeUser(function(id, done) {
     //retrieve user with the key given as obj parameter
     //the fetched object will be attached to req.user
+    
+    console.log("user deserialized");
 
     done(null, id);
 
@@ -206,7 +209,7 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
   var auth = function(req, res, next) {
     //Middleware function to check if user is authenticated, to be used in every secured route
 
-    if (!req.authenticated) {
+    if (!req.isAuthenticated()) {
       //if user is not authenticated send a 401 response status code
       //every 401 will be intercepted by $httpProvider.interceptors in Angular JS front-end
       console.log("You need to login!");
@@ -215,7 +218,6 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
 
     } else {
       //if user is authenticated move on to next middleware function in stack
-
 
       next();
       //user is logged in and move on to next middleware function in stack
@@ -248,7 +250,7 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
     //route to log out from Twittr login
 
     req.logout();
-    //use Passport JS build in method to log user iut and deserialize user
+    //use Passport JS build in method to log user out and deserialize user
 
     res.redirect('/');
     //redirect to homepage after log out
@@ -392,7 +394,7 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
   }); // app.get("/retrieveallpins"
 
 
-  app.get("/retrieveuserpins", function(req, res) {
+  app.get("/retrieveuserpins",function(req, res) {
     //we have req.user.id (string) and req.body    
 
     db.collection(PICS_COLLECTION).find({

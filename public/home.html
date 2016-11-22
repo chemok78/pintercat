@@ -1,9 +1,11 @@
-<div class="container">
-    <div class="grid">
-        <div ng-repeat="pin in allPins" class="grid-item">
-            <img src="{{pin.url}}" class="img-thumbnail img-responsive img-rounded">
-            <p>{{pin.description}}</p>
-             <button type="submit" class="btn btn-default btn-warning" ng-click="editLikes(pin)">{{pin.likes.length}} Likes</button>
-        </div>
-    </div>
+<div class="container" ng-controller="images">
+<ul angular-grid="allPins" grid-width="250" gutter-size="10" angular-grid-id="gallery" refresh-on-img-load="false">
+        <li ng-repeat="pin in allPins" class="grid">
+            <img src="{{pin.url}}" class="grid-img">
+            <p class="description text-center" >{{pin.description}}</p>
+            <img src="{{pin.profile_image_url}}" class="img-thumbnail">
+             <button type="submit" class="btn btn-default btn-warning likes-button" ng-click="editLikes(pin)">{{pin.likes.length}} Likes</button>
+        </li>
+</ul>
 </div>
+
