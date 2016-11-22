@@ -83,7 +83,9 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
 
   app.use(session({
     //use express sessions in app    
-    secret: 'keyboard cat'
+    secret: 'keyboard cat',
+    
+    cookie: {secure:true}
 
   }));
 
@@ -98,7 +100,7 @@ mongodb.MongoClient.connect(process.env.DB_URL, function(err, database) {
 
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-    callbackURL: process.env.TWITTER_CALLBACK_DEVELOPMENT
+    callbackURL: process.env.TWITTER_CALLBACK_PRODUCTION
 
   }, function(token, tokenSecret, profile, done) {
 
