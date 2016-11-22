@@ -36,7 +36,6 @@
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#/">Home</a></li>
-                    <li ng-show="loggedIn === true"><a href="/#allpics">All Pics</a></li>
                     <li ng-show="loggedIn === true"><a href="/#mypics">My Pics</a></li>
                     <li ng-show="loggedIn === true"><a href="" data-toggle="modal" data-target="#addPicModal">Add a Pic</a></li>
                     <li ng-show="loggedIn === false"><a href="/auth/twitter">Sign in with Twitter</a></li>
@@ -45,9 +44,6 @@
             </div><!--collapse navbar-collapse-->
             </div><!--container-->
         </nav>
-        
-        <p>{{pic}}</p>
-        
         
         <div class="container" ng-view>
             

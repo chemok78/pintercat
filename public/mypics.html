@@ -1,21 +1,10 @@
-<!--<div class="container">
-    <ul class="list-group grid">
-        <li ng-repeat="pin in userPins" class="list-group-item grid-item">
-            <img src="{{pin.url}}" class="img-thumbnail img-responsive img-rounded">
-            <p>{{pin.description}}</p>
-        </li>
-    </ul>
-</div>-->
-
 <div class="container">
     <div class="grid">
         <div ng-repeat="pin in userPins" class="grid-item">
             <img src="{{pin.url}}" class="img-thumbnail img-responsive img-rounded">
             <p>{{pin.description}}</p>
              <button type="submit" class="btn btn-default btn-danger" ng-click="deletePic(pin)">Delete</button>
-             <button type="submit" class="btn btn-default btn-warning" >{{pin.likes.length}} Likes</button>
+             <p>{{pin.likes.length}} Likes</p>
         </div>
     </div>
 </div>
-
-{{userPins}}
